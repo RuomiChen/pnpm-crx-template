@@ -1,3 +1,4 @@
+//@ts-nocheck
 import { defineManifest } from '@crxjs/vite-plugin'
 import packageData from '../package.json'
 
