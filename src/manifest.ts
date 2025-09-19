@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { defineManifest } from '@crxjs/vite-plugin'
 import packageData from '../package.json'
 
@@ -29,7 +30,10 @@ export default defineManifest({
     {
       matches: ['http://*/*', 'https://*/*'],
       js: ['src/contentScript/index.ts'],
-    },
+    },{
+      matches:['https://www.tesla.com/*'],
+      js: ['src/contentScript/tesla.ts'],
+    }
   ],
   side_panel: {
     default_path: 'sidepanel.html',
