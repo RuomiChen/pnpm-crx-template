@@ -31,7 +31,7 @@ export default defineManifest({
       matches: ['http://*/*', 'https://*/*'],
       js: ['src/contentScript/index.ts'],
     },{
-      matches:['https://www.tesla.com/*'],
+      matches:['https://www.tesla.cn/*'],
       js: ['src/contentScript/tesla.ts'],
     }
   ],
