@@ -10,7 +10,7 @@ onMounted(async()=>{
 })
 
 const openWeb = () => {
-  window.open('https://www.tesla.com/model3/design#overview')
+  window.open('https://www.tesla.cn')
 }
 const form = ref({
   content: ''

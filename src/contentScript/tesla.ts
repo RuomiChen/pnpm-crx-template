@@ -45,7 +45,22 @@ function simulateClick(el: any) {
   });
   el.dispatchEvent(event);
 }
+/**
+ * 勾选复选框/单选框
+ */
+function checkInput(selector: string) {
+  const el = document.querySelector(selector) as HTMLInputElement;
+  if (!el) {
+    console.warn("未找到 input:", selector);
+    return;
+  }
 
+  if (!el.checked) {
+    el.checked = true; // 设置为选中
+    el.dispatchEvent(new Event("change", { bubbles: true }));
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+}
 /**
  * 通用设置值（支持 React/Vue 受控组件）
  */
@@ -77,7 +92,7 @@ async function fillAndSend({ lastName, firstName, email, phone, idCard }: any) {
   setVal('#EMAIL_CONFIRM', email);
   setVal('#totp__phone-number-input', phone);
   setVal('#IDENTIFICATION_NUMBER', idCard);
-
+  console.log(phoneEl.outerHTML)
   // ⚡ 关键：再聚焦 + 点击手机号输入框，触发受控逻辑
   phoneEl.focus();
   phoneEl.click();
@@ -93,7 +108,7 @@ async function fillAndSend({ lastName, firstName, email, phone, idCard }: any) {
       return;
     }
     ElMessage.error('验证码按钮没找到，重试中...');
-    await sleep(0.4);
+    await sleep(0.3);
   }
   console.error('验证码按钮触发失败');
 }
@@ -101,7 +116,7 @@ async function fillAndSend({ lastName, firstName, email, phone, idCard }: any) {
 
 async function main() {
   console.log('开始执行表单填充逻辑...');
-   // 打开表单按钮
+  // 打开表单按钮
   const openBtn1 = await waitForElement('.tds-btn.aside-footer--button');
   simulateClick(openBtn1);
 
@@ -123,27 +138,37 @@ async function main() {
   // 点击 footer 按钮和支付按钮
   const footerBtn = await waitForElement('.tds-btn.aside-footer--button');
   simulateClick(footerBtn);
-  await sleep(0.5);
+  await sleep(0.3);
 
-  const payBtn = await waitForElement('[data-gio-eventname="web_design_payment_place"]');
-  simulateClick(payBtn);
+  // const payBtn = await waitForElement('[data-gio-eventname="web_design_payment_place"]');
+  // simulateClick(payBtn);
 
-  // 点击协议
+  // 协议 & 支付方式
   const selectors = [
-    '#ORDER_CONSENT',
-    '#RETURN_POLICY_CONSENT',
-    '#VIN_INTERNATIONAL_TRANSFER_CONSENT',
-    'label[for="option-WECHATPAY"]',
+    "#option-WECHATPAY",
+    "#ORDER_CONSENT",
+    "#RETURN_POLICY_CONSENT",
+    "#VIN_INTERNATIONAL_TRANSFER_CONSENT",
   ];
 
   for (const sel of selectors) {
     try {
-      const el = await waitForElement(sel, 3000);
-      simulateClick(el);
-      await sleep(0.2);
+      const el = await waitForElement(sel) as HTMLElement;
+      checkInput(sel);
+      el.focus();
+      el.click();
     } catch (err) {
-      console.warn('找不到协议元素', sel);
+      console.warn("找不到协议元素", sel);
     }
+  }
+
+  // 支付方式：label 绑定 input
+  try {
+    const wechatLabel = await waitForElement('label[for="option-WECHATPAY"]');
+    simulateClick(wechatLabel); // 触发 label 的点击
+    checkInput("#option-WECHATPAY"); // 确保 input 真正选中
+  } catch (err) {
+    console.warn("微信支付选项未找到");
   }
 
   // 提交按钮
